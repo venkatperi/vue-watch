@@ -1,36 +1,44 @@
 <template>
   <div>
-    <vue-convert-model v-model="text" :converter="upperCase">
-      <textarea
-        ref="input"
-        class="input2"> </textarea>
-    </vue-convert-model>
+    <vue-watch :dispatch="{text: 'textChanged'}">
+      <text-component />
+    </vue-watch>
+    <div class="info" v-html="theEvent"></div>
   </div>
 </template>
 
 
 <script>
-  import VueConvertModel from '../../../src'
+  import Vue from 'vue'
+  import VueWatch from '../../../src'
+
+  const TextComponent = Vue.component('text-component', {
+    data() {
+      return {
+        text: '',
+      }
+    },
+    template: '<textarea v-model="text" class="input2"></textarea>',
+  } )
 
   export default {
 
     components: {
-      VueConvertModel,
+      VueWatch, TextComponent,
     },
 
     data() {
       return {
-        original: '',
-        text: '',
+        theEvent: '',
       }
     },
 
-    methods: {
-      upperCase( x ) {
-        return (x || '').toUpperCase()
-      },
+    mounted() {
+      const that = this
+      this.$el.addEventListener( 'textChanged', function ( e ) {
+        that.theEvent = e.detail
+      } )
     },
-
   }
 </script>
 
@@ -42,7 +50,7 @@
     text-align: center;
   }
 
-  label {
+  label, .info {
     font-size: 12px;
     font-family: sans-serif;
     width: 100%;

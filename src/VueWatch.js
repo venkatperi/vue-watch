@@ -21,13 +21,14 @@
 
 const dispatch = ( el, type ) => ( current, old ) => {
   el.dispatchEvent( new CustomEvent( type, {
+    bubbles: true,
     detail: { current, old },
   } ) )
 }
 
 // noinspection JSUnusedGlobalSymbols
 export default {
-  name: 'vue-dispatch',
+  name: 'vue-watch',
 
   props: {
     dispatch: {
@@ -44,8 +45,18 @@ export default {
   },
 
   mounted() {
-    let vm = this.$children[0]
-    let el = this.$el
+    console.log( `vue-watch:mounted()` )
+    const vm = this.$children.length > 0 ?
+      this.$children[0] :
+      this.$el.__vue__
+
+    if ( !vm )
+      throw new Error( 'No suitable child found' )
+
+    const el = vm.$el || this.$el
+    if ( !el )
+      throw new Error( 'No element!!?' )
+
     for ( const [prop, type] of Object.entries( this.dispatch ) ) {
       this.watchers.push( vm.$watch( prop, dispatch( el, type ) ) )
     }

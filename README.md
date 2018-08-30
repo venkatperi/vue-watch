@@ -1,14 +1,14 @@
-# vue-resize-on-event
+# vue-watch
 
-![npm](https://img.shields.io/npm/v/vue-resize-on-event.svg) 
+![npm](https://img.shields.io/npm/v/vue-watch.svg)
 [![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
 
-VueJS renderless component that wraps a component with a model (e.g. `input` or `textarea`) and transforms data to/from the underlying component's model with a given conversion function.
- 
+`vue-watch` is a [Vue](www.vuejs.org) component that fires events when specific properties of a child component change.
+
 # Installation
 
 ```
-npm install --save vue-convert-model
+npm install --save vue-watch
 ```
 
 # Example
@@ -16,26 +16,36 @@ npm install --save vue-convert-model
 Include the component:
 
 ```javascript
-import Vue from 'vue'
-import VueConvertModel from 'vue-convert-model'
+  import Vue from 'vue'
+  import VueWatch from 'vue-watch'
 
-export default {
-  components: {
-    VueConvertModel,
-  },
-
-  data() {
-     return {
-       text: '',
-     }
-   },
-
-  methods: {
-    upperCase( x ) {
-      return (x || '').toUpperCase()
+  const TextComponent = Vue.component('text-component', {
+    data() {
+      return {
+        text: '',
+      }
     },
-  },
-}
+    template: '<textarea v-model="text" class="input2"></textarea>',
+  } )
+
+  export default {
+
+    components: {
+      VueWatch, TextComponent,
+    },
+
+    data() {
+      return {
+        theEvent: '',
+      }
+    },
+
+    mounted() {
+      const that = this
+      this.$el.addEventListener( 'textChanged', function ( e ) {
+        that.theEvent = e.detail
+      } )
+    },
 ```
 
 
@@ -43,12 +53,16 @@ export default {
 
 ```html
 <template>
-  <vue-convert-model v-model="text" :converter="upperCase">
-    <textarea>
-    </textarea>
-  </vue-convert-model>
+  <div>
+    <vue-watch :dispatch="{text: 'textChanged'}">
+      <text-component />
+    </vue-watch>
+    <div class="info" v-html="theEvent"></div>
+  </div>
 </template>
 ```
+
+
 
 ---
 
